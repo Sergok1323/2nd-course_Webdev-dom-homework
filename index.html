@@ -50,34 +50,43 @@
         date: "12.02.22 12:18",
         text: "Это будет первый комментарий на этой странице",
         likesCount: 3,
-        myLike: false
+        isLiked: false
       },
       {
         name: "Варвара Н.",
         date: "13.02.22 19:22",
         text: "Мне нравится как оформлена эта страница! ❤",
         likesCount: 75,
-        myLike: true
+        isLiked: true
       },
     ];
     
     const initEventListner = () => {
-      const likeButtons = document.querySelectorAll('.like-button');
+    const likeButtons = document.querySelectorAll('.like-button');
 
-      for (const likeButton of likeButtons) {
-        likeButton.addEventListener('click', () => {
-          let count = likeButton.dataset.count;
-          count ++;
-          console.log(count);          
-        });
+    for (const likeButton of likeButtons) {
+    likeButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+
+      let index = likeButton.dataset.index;
+      if (comments[index].isLiked) {
+        comments[index].isLiked = false;
+        comments[index].likesCount--;
+      } else {
+        comments[index].isLiked = true;
+        comments[index].likesCount++;
       }
+      renderComments();
+
+      });
+    }
     }
 
 
 
 
     const renderComments = () => {
-      const commentsHtml = comments.map((comment) => {
+      const commentsHtml = comments.map((comment, index) => {
         return `<li class="comment">
           <div class="comment-header">
           <div>${comment.name}</div>
@@ -91,12 +100,14 @@
           <div class="comment-footer">
             <div class="likes">
               <span class="likes-counter" >${comment.likesCount}</span>
-              <button class="like-button" data-count="${comment.likesCount}"></button>
+              <button class="like-button ${comment.isLiked ? '-active-like' : ''}" data-index="${index}"></button>
             </div>
           </div>
         </li>`
       }).join('');
       listElement.innerHTML = commentsHtml;
+      initEventListner();
+
     };
  
     renderComments();
