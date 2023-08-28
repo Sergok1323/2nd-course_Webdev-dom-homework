@@ -43,7 +43,30 @@
     const listElement = document.getElementById('list-comments');
     const nameInputElement = document.getElementById('name-input');
     const textInputElement = document.getElementById('text-input');
-       
+    
+    function getCurrentDate() {
+      let myDate = new Date();
+      let date = myDate.getDate();
+      let month = myDate.getMonth()+1;
+      let year = myDate.getFullYear();
+      let hours = myDate.getHours();
+      let minute = myDate.getMinutes();
+      if (date < 10) {
+        date = "0" + date;
+      }
+      if (month < 10) {
+        month = "0" + month;
+      }
+      if (hours < 10) {
+        hours = "0" + hours;
+      }
+      if (minute < 10) {
+        minute = "0" + minute
+      }
+      const dateNow = date + '.' + month + '.' + String(year).slice(2) + ' ' + hours + ':' + minute; 
+      return dateNow;
+    }
+
     fetch(
       "https://wedev-api.sky.pro/api/v1/sergey-kuzin/comments",
       {
@@ -56,7 +79,7 @@
           name: comment.author.name,
           date: new Date(comment.date),
           text: comment.text,
-          likes: comment.likesCount,
+          likes: comment.likes,
           isLiked: false,
         }
        });
@@ -71,8 +94,8 @@
       {
         method: "POST",
         body: JSON.stringify({
-          text: "textInputElement.value",
-          name: "nameInputElement.value",
+          text: textInputElement.value,
+          name: nameInputElement.value,
         }),
       }
     ).then((response) => {
@@ -94,10 +117,10 @@
       let index = likeButton.dataset.index;
       if (comments[index].isLiked) {
         comments[index].isLiked = false;
-        comments[index].likesCount--;
+        comments[index].likes--;
       } else {
         comments[index].isLiked = true;
-        comments[index].likesCount++;
+        comments[index].likes++;
       }
       renderComments();
 
@@ -120,7 +143,7 @@
         return `<li class="comment" data-index="${index}">
           <div class="comment-header">
           <div>${comment.name}</div>
-          <div>${comment.date}</div>
+          <div>${getCurrentDate(comment.date)}</div>
           </div>
           <div class="comment-body">
             <div class="comment-text">
@@ -129,7 +152,7 @@
           </div>
           <div class="comment-footer">
             <div class="likes">
-              <span class="likes-counter" >${comment.likesCount}</span>
+              <span class="likes-counter" >${comment.likes}</span>
               <button class="like-button ${comment.isLiked ? '-active-like' : ''}" data-index="${index}"></button>
             </div>
           </div>
@@ -191,11 +214,11 @@
           name: nameInputElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
           date: currentDate,
           text: textInputElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
-          likesCount: "0",
+          likes: "0",
           myLike: false
         });
-        nameInputElement.value="";
-        textInputElement.value="";
+        /*nameInputElement.value="";
+        textInputElement.value="";*/
         renderComments();
         initEventListner();
 
