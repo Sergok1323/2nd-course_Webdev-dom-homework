@@ -86,24 +86,7 @@
        comments = appComments;
        renderComments();
       })
-
     });
-
-    fetch(
-      "https://wedev-api.sky.pro/api/v1/sergey-kuzin/comments",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          text: textInputElement.value,
-          name: nameInputElement.value,
-        }),
-      }
-    ).then((response) => {
-      response.json().then((responseData) => {
-
-        renderComments();
-      })
-    }); 
 
     let comments = [];
     
@@ -164,15 +147,35 @@
     };
     renderComments();
     initEventListner();
-
-    
-
-
-
-    
+ 
 
 
     buttonElement.addEventListener("click", () => {
+      fetch(
+          "https://wedev-api.sky.pro/api/v1/sergey-kuzin/comments",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              text: textInputElement.value,
+              name: nameInputElement.value,
+            }),
+          }
+  ).then((response) => {
+    const jsonPromise = response.json();
+    jsonPromise.then((responseData) => {
+      comments = responseData.comments.map((comment) => {
+        return {
+          name: comment.author.name,
+          date: new Date(comment.date),
+          text: comment.text,
+          likes: comment.likes,
+          isLiked: false,
+        };
+      });
+      renderComments();
+    });
+  });
+
       function getCurrentDate() {
       let myDate = new Date();
       let date = myDate.getDate();
@@ -217,8 +220,8 @@
           likes: "0",
           myLike: false
         });
-        /*nameInputElement.value="";
-        textInputElement.value="";*/
+        nameInputElement.value="";
+        textInputElement.value="";
         renderComments();
         initEventListner();
 
